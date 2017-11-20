@@ -1,0 +1,6 @@
+This repository contains Android sandbox projects. Test and learning purposes only. 
+
+- GithubSearch: A project that is based on Retrofit and RxJava. Simple master-detail activity only. No data persistence with Room.
+
+ 
+
