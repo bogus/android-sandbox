@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="repository"
+            type="net.bogus.githubsearch.model.Repository" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/repositoryName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{ repository.name }"
+            android:layout_alignParentTop="true"
+            android:paddingBottom="8dp"
+            />
+
+        <TextView
+            android:id="@+id/ownerName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{ repository.owner.login }"
+            android:layout_below="@id/repositoryName"
+            />
+
+    </RelativeLayout>
+</layout>
