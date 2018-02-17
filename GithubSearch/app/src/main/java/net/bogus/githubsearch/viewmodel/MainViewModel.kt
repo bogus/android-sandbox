@@ -20,6 +20,7 @@ import net.bogus.githubsearch.di.AppComponent
 import net.bogus.githubsearch.di.AppModule
 import net.bogus.githubsearch.event.Event
 import net.bogus.githubsearch.model.Repository
+import net.bogus.githubsearch.util.ExponentialBackoffRetry
 import javax.inject.Inject
 
 /**
@@ -67,6 +68,7 @@ class MainViewModel {
     private fun makeAPICall(page:Int) {
         isLoading.set(true)
         apiClient.search(lastQuery, page).subscribeOn(Schedulers.io())
+                .retryWhen(ExponentialBackoffRetry(3, 3000))
                 .observeOn(AndroidSchedulers.mainThread())
                 .doFinally {
                     isLoading.set(false)
