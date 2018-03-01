@@ -18,19 +18,28 @@ import net.bogus.githubsearch.databinding.ActivityMainBinding
 import android.nfc.tech.MifareUltralight.PAGE_SIZE
 import android.support.v7.widget.DividerItemDecoration
 import android.widget.TextView
+import android.widget.Toast
+import butterknife.BindView
+import butterknife.ButterKnife
 import com.jakewharton.rxbinding2.support.v7.widget.RxRecyclerView
 import com.jakewharton.rxbinding2.support.v7.widget.RxRecyclerViewAdapter
 import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView
 import com.jakewharton.rxbinding2.widget.RxTextView
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main.*
+import net.bogus.githubsearch.model.Repository
+import net.bogus.githubsearch.util.OnItemSelectedListener
 import net.bogus.githubsearch.viewmodel.MainActivityViewModel
+import java.time.Duration
 import javax.inject.Inject
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnItemSelectedListener<Repository> {
 
     @Inject lateinit var apiClient:APIClient
+    @BindView(R.id.recyclerView) lateinit var recyclerView:RecyclerView
+    @BindView(R.id.srl) lateinit var swipeRefreshLayout:SwipeRefreshLayout
+    @BindView(R.id.searchView) lateinit var searchView:SearchView
     var viewModel:MainActivityViewModel? = null
     val compositeDisposable = CompositeDisposable()
 
@@ -43,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         }
         viewModel?.let {
             val binding = DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
-            val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+            ButterKnife.bind(this)
             var disposable = RxRecyclerView.scrollEvents(recyclerView)
                     .subscribe({ observer ->
                         val layoutManager = observer.view().layoutManager as? LinearLayoutManager
@@ -53,6 +62,7 @@ class MainActivity : AppCompatActivity() {
                     })
             compositeDisposable.add(disposable)
             recyclerView.adapter = RepositoryAdapter(it)
+            (recyclerView.adapter as? RepositoryAdapter)?.clickListener = this
             recyclerView.setHasFixedSize(true)
             recyclerView.addItemDecoration(DividerItemDecoration(this, 0))
             recyclerView.layoutManager = LinearLayoutManager(this)
@@ -65,11 +75,11 @@ class MainActivity : AppCompatActivity() {
                                 Snackbar.LENGTH_LONG).show()
                     }
 
-            findViewById<SwipeRefreshLayout>(R.id.srl)?.setOnRefreshListener {
+            swipeRefreshLayout.setOnRefreshListener {
                 it.refresh()
             }
 
-            disposable = RxSearchView.queryTextChangeEvents(findViewById<SearchView>(R.id.searchView))
+            disposable = RxSearchView.queryTextChangeEvents(searchView)
                     .subscribe({
                         observer ->
                         if(observer.isSubmitted) {
@@ -78,6 +88,10 @@ class MainActivity : AppCompatActivity() {
                     })
             compositeDisposable.add(disposable)
         }
+    }
+
+    override fun onClick(item: Repository) {
+        Toast.makeText(this, item.name, Toast.LENGTH_LONG).show()
     }
 
     override fun onDestroy() {

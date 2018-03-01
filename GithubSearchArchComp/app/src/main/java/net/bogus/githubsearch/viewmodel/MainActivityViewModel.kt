@@ -5,14 +5,16 @@ import android.databinding.ObservableField
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.ReplaySubject
 import net.bogus.githubsearch.APIClient
 import net.bogus.githubsearch.model.Repository
 import net.bogus.githubsearch.util.ExponentialBackoffRetry
 import java.util.concurrent.TimeUnit
 
 
-class MainActivityViewModel : ViewModel() {
+open class MainActivityViewModel : ViewModel() {
 
     var apiClient:APIClient? = null
     set(value) {
@@ -25,11 +27,11 @@ class MainActivityViewModel : ViewModel() {
         })
     }
 
-    var result = PublishSubject.create<List<Repository>>()
+    var result = BehaviorSubject.create<List<Repository>>()
     var error = PublishSubject.create<String>()
     val lastPage = PublishSubject.create<Int>()
 
-    var isLoading = ObservableField<Boolean>()
+    open var isLoading = ObservableField<Boolean>()
     var currentPage = ObservableField<Int>()
 
     private var lastQuery = ""
@@ -43,7 +45,7 @@ class MainActivityViewModel : ViewModel() {
         result.onNext(data)
     }
 
-    fun nextPage() {
+    open fun nextPage() {
         if (isLoading.get()) {
             return
         }
@@ -78,13 +80,15 @@ class MainActivityViewModel : ViewModel() {
         search(lastQuery)
     }
 
-    fun shouldLoadNextPage(childCount:Int, totalItemCount:Int, firstVisibleItemPosition:Int) {
+    open fun shouldLoadNextPage(childCount:Int, totalItemCount:Int, firstVisibleItemPosition:Int) : Boolean {
         if (isLoading.get() == false &&
                 childCount + firstVisibleItemPosition >= totalItemCount
                 && firstVisibleItemPosition >= 0
                 && totalItemCount >= 3) {
             nextPage()
+            return true
         }
+        return false
     }
 
     override fun onCleared() {
