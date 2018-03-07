@@ -1,6 +1,7 @@
 This repository contains Android sandbox projects. Test and learning purposes only. 
 
 - GithubSearch: A project that is based on Retrofit and RxJava. Simple master-detail activity only. No data persistence with Room.
+- GithubSearchArchComponents: A project that is based on Retrofit, RxJava, Architecture Components, Dagger and stuff. No data persistence with Room yet.
 - Services: A project that contains IntentService, BoundService and a regular sevice implementation using broadcast receivers, binders and messengers. 
  
 
